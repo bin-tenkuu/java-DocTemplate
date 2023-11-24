@@ -19,7 +19,7 @@ public class PoiDemoWordTable {
         params.setText("名字", "系统");
         params.setParam("图片", WordParam.image(new File("./config/img.png")));
 
-        ChartTable chartTable = params.addChart("占基金资产净值比例(%)")
+        ChartTable chartTable = params.addChart("params")
                 .setTitle("更新标题-占基金资产净值比例(%)");
         chartTable.getXAxis()
                 .addAllData("材料费用", "出差费用", "住宿费用");

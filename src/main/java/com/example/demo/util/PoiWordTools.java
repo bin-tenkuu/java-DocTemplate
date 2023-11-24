@@ -23,6 +23,22 @@ import java.io.IOException;
 @Slf4j
 public class PoiWordTools {
 
+    public static boolean buildDoc(WordParams params, File from, File to) {
+        try (val in = new FileInputStream(from)) {
+            try (val doc = new XWPFDocument(in)) {
+                replaceParagraph(doc, params);
+                replaceChart(doc, params);
+                try (val out = new FileOutputStream(to)) {
+                    doc.write(out);
+                }
+            }
+            return true;
+        } catch (IOException | InvalidFormatException e) {
+            log.error("生成word失败", e);
+            return false;
+        }
+    }
+
     private enum ReplaceType {
         NotFound,
         $,
@@ -139,23 +155,7 @@ public class PoiWordTools {
 
     }
 
-    public static boolean buildDoc(WordParams params, File from, File to) {
-        try (val in = new FileInputStream(from)) {
-            try (val doc = new XWPFDocument(in)) {
-                replaceParagraph(doc, params);
-                replaceChart(doc, params);
-                try (val out = new FileOutputStream(to)) {
-                    doc.write(out);
-                }
-            }
-            return true;
-        } catch (IOException | InvalidFormatException e) {
-            log.error("生成word失败", e);
-            return false;
-        }
-    }
-
-    public static String getBarTitle(XWPFChart chart) {
+    private static String getBarTitle(XWPFChart chart) {
         XDDFTitle title = chart.getTitle();
         if (title != null) {
             return title.getBody().getParagraph(0).getText();
@@ -166,7 +166,7 @@ public class PoiWordTools {
     /**
      * 调用替换柱状图、折线图组合数据
      */
-    public static void replaceCharts(XWPFChart chart, ChartTable chartTable) {
+    private static void replaceCharts(XWPFChart chart, ChartTable chartTable) {
         // 设置标题
         chart.setTitleText(chartTable.getTitle());
 
@@ -193,11 +193,11 @@ public class PoiWordTools {
         }
     }
 
-    public static XDDFCategoryDataSource fromString(ChartColumn<String> column) {
+    private static XDDFCategoryDataSource fromString(ChartColumn<String> column) {
         return XDDFDataSourcesFactory.fromArray(column.toArray(new String[0]));
     }
 
-    public static XDDFNumericalDataSource<Number> fromNumber(ChartColumn<Number> column) {
+    private static XDDFNumericalDataSource<Number> fromNumber(ChartColumn<Number> column) {
         return XDDFDataSourcesFactory.fromArray(column.toArray(new Number[0]));
     }
 
